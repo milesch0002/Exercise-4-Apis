@@ -42,5 +42,37 @@ for (const detail of details) {
   });
 }
 
-const posts = await downloadPosts();
+const posts = await downloadPosts(1);
 console.log(posts);
+
+// display data from api
+
+let main = document.querySelector("main");
+
+let article = "";
+
+for (let i = 0; i < posts.length; i++) {
+  article = `<article data-post-id=${posts[i].id}><h2>${posts[i].title}</h2>`;
+  let username = await getUserName(posts[i].userId);
+  article += `<aside>by <span class="author">${username}</span></aside>`;
+  let body = posts[i].body;
+  body = body.replaceAll("\n", "<br>");
+  article += `<p>${body}</p>`;
+  article += `</article>`;
+
+  article += `<details>`;
+  article += `<summary>See what our readers had to say...</summary>
+  <section>
+    <header>
+      <h3>Comments</h3>
+    </header>`;
+  let comment = await downloadComments(posts[i].id);
+  for (let i = 0; i < comment.length; i++) {
+    article += `<aside><p>${comment[i].body}</p><br><p><small>${comment[i].name}</small></p></aside>`;
+  }
+
+  article += `</section>`;
+  article += `</details>`;
+
+  main.innerHTML += article;
+}
